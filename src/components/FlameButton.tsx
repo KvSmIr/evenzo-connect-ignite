@@ -8,9 +8,10 @@ type Props = {
   eventId: string;
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
+  pill?: boolean;
 };
 
-export function FlameButton({ eventId, size = "md", fullWidth }: Props) {
+export function FlameButton({ eventId, size = "md", fullWidth, pill }: Props) {
   const { flames, cycleFlame } = useFlames();
   const status = flames[eventId] ?? "none";
   const [pulse, setPulse] = useState(false);
@@ -39,14 +40,16 @@ export function FlameButton({ eventId, size = "md", fullWidth }: Props) {
     }
   };
 
-  const sizeClasses =
-    size === "lg" ? "h-14 px-6 text-base"
+  const sizeClasses = pill
+    ? "h-10 px-4 text-[13px]"
+    : size === "lg" ? "h-14 px-6 text-base"
     : size === "sm" ? "h-9 px-3 text-xs"
     : "h-11 px-4 text-sm";
 
   const iconSize = size === "lg" ? "h-5 w-5" : size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
 
-  const base = "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all active:scale-[0.97] select-none";
+  const radius = pill ? "rounded-[20px]" : "rounded-lg";
+  const base = `inline-flex items-center justify-center gap-2 ${radius} font-bold transition-all active:scale-[0.97] select-none`;
 
   if (status === "going") {
     return (

@@ -60,11 +60,17 @@ function HomePage() {
                 key={label}
                 onClick={() => setFilter(value)}
                 className={cn(
-                  "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all",
+                  "shrink-0 rounded-[17px] text-[13px] font-semibold transition-all",
                   active
-                    ? "bg-primary text-primary-foreground shadow-flame"
-                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                    ? "text-white"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
+                style={{
+                  height: "34px",
+                  padding: "8px 16px",
+                  background: active ? "#E8593C" : "transparent",
+                  border: active ? "0.5px solid #E8593C" : "0.5px solid #333",
+                }}
               >
                 {label}
               </button>
@@ -82,10 +88,18 @@ function HomePage() {
             className="flex shrink-0 flex-col items-center gap-1.5"
             aria-label="Créer une story"
           >
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/40 bg-secondary">
+            <div
+              className="flex items-center justify-center rounded-full bg-secondary"
+              style={{ width: "56px", height: "56px", border: "2px dashed #444" }}
+            >
               <Plus className="h-6 w-6 text-muted-foreground" />
             </div>
-            <span className="text-[10px] font-medium text-muted-foreground">Créer</span>
+            <span
+              className="block max-w-[64px] overflow-hidden text-center text-[11px] font-medium text-muted-foreground"
+              style={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+            >
+              Créer
+            </span>
           </Link>
 
           {FRIENDS.map((f) => (
@@ -94,16 +108,21 @@ function HomePage() {
               className="flex shrink-0 flex-col items-center gap-1.5"
               aria-label={`Story de ${f.name}`}
             >
-              <div className="rounded-full bg-gradient-flame p-[2px]">
-                <div className="rounded-full border-2 border-background bg-background">
-                  <img
-                    src={f.avatar}
-                    alt={f.name}
-                    className="h-14 w-14 rounded-full bg-secondary object-cover"
-                  />
-                </div>
+              <div
+                className="flex items-center justify-center rounded-full"
+                style={{ width: "56px", height: "56px", border: "2.5px solid #F97316" }}
+              >
+                <img
+                  src={f.avatar}
+                  alt={f.name}
+                  className="rounded-full bg-secondary object-cover"
+                  style={{ width: "48px", height: "48px" }}
+                />
               </div>
-              <span className="max-w-[64px] truncate text-[10px] font-medium text-foreground">
+              <span
+                className="block max-w-[64px] overflow-hidden text-center text-[11px] font-medium text-foreground"
+                style={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+              >
                 {f.name}
               </span>
             </button>
@@ -112,10 +131,19 @@ function HomePage() {
       </section>
 
       {/* Feed */}
-      <section className="space-y-4 px-4 py-4">
-        <div className="flex items-baseline justify-between">
+      <section className="px-4 py-4" style={{ paddingLeft: "16px", paddingRight: "16px" }}>
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">À ne pas manquer</h2>
-          <span className="text-xs text-muted-foreground">{filtered.length} événements</span>
+          <span
+            className="inline-flex items-center rounded-[12px] text-[12px] font-semibold"
+            style={{
+              background: "rgba(249,115,22,0.15)",
+              color: "#F97316",
+              padding: "3px 10px",
+            }}
+          >
+            {filtered.length} événements
+          </span>
         </div>
 
         {filtered.length === 0 ? (
@@ -129,7 +157,7 @@ function HomePage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {filtered.map((e, i) => (
               <EventCard key={e.id} event={e} index={i} />
             ))}

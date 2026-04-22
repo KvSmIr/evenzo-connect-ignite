@@ -29,6 +29,8 @@ export type EventItem = {
   cover: string;
   isFree: boolean;
   price?: string;     // e.g. "2000 FCFA"
+  trending?: boolean;
+  tonight?: boolean;
   flameCount: number;
   hotFriends: Friend[]; // friends "chaud" for this
   organizer: Friend;
@@ -71,6 +73,7 @@ export const EVENTS: EventItem[] = [
     cover: afrobeats,
     isFree: false,
     price: "2 000 FCFA",
+    trending: true,
     flameCount: 287,
     hotFriends: [FRIENDS[0], FRIENDS[1], FRIENDS[3], FRIENDS[5]],
     organizer: FRIENDS[0],
@@ -90,6 +93,7 @@ export const EVENTS: EventItem[] = [
     cover: concert,
     isFree: false,
     price: "5 000 FCFA",
+    trending: true,
     flameCount: 340,
     hotFriends: [FRIENDS[1], FRIENDS[2], FRIENDS[4], FRIENDS[6], FRIENDS[7]],
     organizer: FRIENDS[2],
@@ -163,6 +167,7 @@ export const EVENTS: EventItem[] = [
     category: "Soirée",
     cover: djset,
     isFree: true,
+    tonight: true,
     flameCount: 98,
     hotFriends: [FRIENDS[0], FRIENDS[1], FRIENDS[5]],
     organizer: FRIENDS[1],
