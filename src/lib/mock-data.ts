@@ -29,6 +29,8 @@ export type EventItem = {
   cover: string;
   isFree: boolean;
   price?: string;     // e.g. "2000 FCFA"
+  trending?: boolean;
+  tonight?: boolean;
   flameCount: number;
   hotFriends: Friend[]; // friends "chaud" for this
   organizer: Friend;
