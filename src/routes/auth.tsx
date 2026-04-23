@@ -34,18 +34,34 @@ function AuthPage() {
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
-          email,
+          email: email.trim().toLowerCase(),
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
             data: { display_name: displayName || email.split("@")[0] },
           },
         });
-        if (error) throw error;
+        if (error) {
+          if (error.message.toLowerCase().includes("already") || error.message.toLowerCase().includes("registered")) {
+            toast.error("Ce compte existe déjà. Connecte-toi à la place.");
+            setMode("signin");
+            return;
+          }
+          throw error;
+        }
         toast.success("Compte créé ! Bienvenue 🔥");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        });
+        if (error) {
+          if (error.message.toLowerCase().includes("invalid")) {
+            toast.error("Email ou mot de passe incorrect");
+            return;
+          }
+          throw error;
+        }
         toast.success("Connecté !");
       }
       navigate({ to: "/" });
