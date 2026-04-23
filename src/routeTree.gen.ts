@@ -13,7 +13,6 @@ import { Route as SocialRouteImport } from './routes/social'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as CreateEventRouteImport } from './routes/create-event'
-import { Route as CreateRouteImport } from './routes/create'
 import { Route as BecomeOrganizerRouteImport } from './routes/become-organizer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -38,11 +37,6 @@ const ExploreRoute = ExploreRouteImport.update({
 const CreateEventRoute = CreateEventRouteImport.update({
   id: '/create-event',
   path: '/create-event',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreateRoute = CreateRouteImport.update({
-  id: '/create',
-  path: '/create',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BecomeOrganizerRoute = BecomeOrganizerRouteImport.update({
@@ -76,7 +70,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-organizer': typeof BecomeOrganizerRoute
-  '/create': typeof CreateRoute
   '/create-event': typeof CreateEventRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
@@ -88,7 +81,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-organizer': typeof BecomeOrganizerRoute
-  '/create': typeof CreateRoute
   '/create-event': typeof CreateEventRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
@@ -101,7 +93,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-organizer': typeof BecomeOrganizerRoute
-  '/create': typeof CreateRoute
   '/create-event': typeof CreateEventRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
@@ -115,7 +106,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-organizer'
-    | '/create'
     | '/create-event'
     | '/explore'
     | '/profile'
@@ -127,7 +117,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-organizer'
-    | '/create'
     | '/create-event'
     | '/explore'
     | '/profile'
@@ -139,7 +128,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-organizer'
-    | '/create'
     | '/create-event'
     | '/explore'
     | '/profile'
@@ -152,7 +140,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BecomeOrganizerRoute: typeof BecomeOrganizerRoute
-  CreateRoute: typeof CreateRoute
   CreateEventRoute: typeof CreateEventRoute
   ExploreRoute: typeof ExploreRoute
   ProfileRoute: typeof ProfileRoute
@@ -188,13 +175,6 @@ declare module '@tanstack/react-router' {
       path: '/create-event'
       fullPath: '/create-event'
       preLoaderRoute: typeof CreateEventRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/create': {
-      id: '/create'
-      path: '/create'
-      fullPath: '/create'
-      preLoaderRoute: typeof CreateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/become-organizer': {
@@ -240,7 +220,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BecomeOrganizerRoute: BecomeOrganizerRoute,
-  CreateRoute: CreateRoute,
   CreateEventRoute: CreateEventRoute,
   ExploreRoute: ExploreRoute,
   ProfileRoute: ProfileRoute,
