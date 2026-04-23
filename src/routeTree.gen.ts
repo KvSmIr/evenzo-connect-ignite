@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as CreateRouteImport } from './routes/create'
+import { Route as CreateEventRouteImport } from './routes/create-event'
+import { Route as BecomeOrganizerRouteImport } from './routes/become-organizer'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventEventIdRouteImport } from './routes/event.$eventId'
 
@@ -31,9 +34,24 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CreateRoute = CreateRouteImport.update({
-  id: '/create',
-  path: '/create',
+const CreateEventRoute = CreateEventRouteImport.update({
+  id: '/create-event',
+  path: '/create-event',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BecomeOrganizerRoute = BecomeOrganizerRouteImport.update({
+  id: '/become-organizer',
+  path: '/become-organizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -49,7 +67,10 @@ const EventEventIdRoute = EventEventIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/create': typeof CreateRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/become-organizer': typeof BecomeOrganizerRoute
+  '/create-event': typeof CreateEventRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
   '/social': typeof SocialRoute
@@ -57,7 +78,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/create': typeof CreateRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/become-organizer': typeof BecomeOrganizerRoute
+  '/create-event': typeof CreateEventRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
   '/social': typeof SocialRoute
@@ -66,7 +90,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/create': typeof CreateRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/become-organizer': typeof BecomeOrganizerRoute
+  '/create-event': typeof CreateEventRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
   '/social': typeof SocialRoute
@@ -76,17 +103,32 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/create'
+    | '/admin'
+    | '/auth'
+    | '/become-organizer'
+    | '/create-event'
     | '/explore'
     | '/profile'
     | '/social'
     | '/event/$eventId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/explore' | '/profile' | '/social' | '/event/$eventId'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/become-organizer'
+    | '/create-event'
+    | '/explore'
+    | '/profile'
+    | '/social'
+    | '/event/$eventId'
   id:
     | '__root__'
     | '/'
-    | '/create'
+    | '/admin'
+    | '/auth'
+    | '/become-organizer'
+    | '/create-event'
     | '/explore'
     | '/profile'
     | '/social'
@@ -95,7 +137,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CreateRoute: typeof CreateRoute
+  AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
+  BecomeOrganizerRoute: typeof BecomeOrganizerRoute
+  CreateEventRoute: typeof CreateEventRoute
   ExploreRoute: typeof ExploreRoute
   ProfileRoute: typeof ProfileRoute
   SocialRoute: typeof SocialRoute
@@ -125,11 +170,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/create': {
-      id: '/create'
-      path: '/create'
-      fullPath: '/create'
-      preLoaderRoute: typeof CreateRouteImport
+    '/create-event': {
+      id: '/create-event'
+      path: '/create-event'
+      fullPath: '/create-event'
+      preLoaderRoute: typeof CreateEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/become-organizer': {
+      id: '/become-organizer'
+      path: '/become-organizer'
+      fullPath: '/become-organizer'
+      preLoaderRoute: typeof BecomeOrganizerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -151,7 +217,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CreateRoute: CreateRoute,
+  AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
+  BecomeOrganizerRoute: BecomeOrganizerRoute,
+  CreateEventRoute: CreateEventRoute,
   ExploreRoute: ExploreRoute,
   ProfileRoute: ProfileRoute,
   SocialRoute: SocialRoute,
