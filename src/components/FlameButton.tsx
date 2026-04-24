@@ -1,28 +1,48 @@
 import { useRef, useState } from "react";
-import { Flame, Check } from "lucide-react";
+import { Flame, Check, Navigation } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 import { useFlames } from "@/lib/flame-store";
+import { useAuth } from "@/lib/auth-store";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 type Props = {
   eventId: string;
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
   pill?: boolean;
+  variant?: "chaud" | "going";
 };
 
-export function FlameButton({ eventId, size = "md", fullWidth, pill }: Props) {
-  const { flames, cycleFlame } = useFlames();
+export function FlameButton({ eventId, size = "md", fullWidth, pill, variant = "chaud" }: Props) {
+  const { flames, toggleChaud, toggleGoing, setFlame } = useFlames();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const status = flames[eventId] ?? "none";
   const [pulse, setPulse] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const next = cycleFlame(eventId);
+    if (!user) {
+      toast.info("Connecte-toi pour réagir");
+      navigate({ to: "/auth" });
+      return;
+    }
     setPulse(true);
     setTimeout(() => setPulse(false), 600);
+
+    let next: "none" | "chaud" | "going";
+    if (variant === "going") {
+      // Going: if already going, remove. If chaud, upgrade to going. Else become going.
+      if (status === "going") next = await setFlame(eventId, "none");
+      else next = await setFlame(eventId, "going");
+    } else {
+      // Chaud toggle
+      next = await toggleChaud(eventId);
+    }
 
     if (next === "chaud" && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
@@ -40,6 +60,9 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill }: Props) {
     }
   };
 
+  // Suppress unused warning for toggleGoing (kept exported on hook for callers)
+  void toggleGoing;
+
   const sizeClasses = pill
     ? "h-10 px-4 text-[13px]"
     : size === "lg" ? "h-14 px-6 text-base"
@@ -51,7 +74,27 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill }: Props) {
   const radius = pill ? "rounded-[20px]" : "rounded-lg";
   const base = `inline-flex items-center justify-center gap-2 ${radius} font-bold transition-all active:scale-[0.97] select-none`;
 
-  if (status === "going") {
+  // GOING variant
+  if (variant === "going") {
+    if (status === "going") {
+      return (
+        <button
+          ref={btnRef}
+          onClick={handleClick}
+          className={cn(
+            base,
+            sizeClasses,
+            fullWidth && "w-full",
+            "text-primary-foreground",
+            pulse && "animate-flame-pulse"
+          )}
+          style={{ background: "#1D9E75" }}
+        >
+          <Check className={iconSize} strokeWidth={3} />
+          J'y vais ✅
+        </button>
+      );
+    }
     return (
       <button
         ref={btnRef}
@@ -60,17 +103,17 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill }: Props) {
           base,
           sizeClasses,
           fullWidth && "w-full",
-          "bg-success/15 text-success border border-success/40",
-          pulse && "animate-flame-pulse"
+          "border border-border bg-secondary text-foreground hover:bg-surface-elevated"
         )}
       >
-        <Check className={iconSize} strokeWidth={3} />
-        J'y vais
+        <Navigation className={iconSize} />
+        Y aller
       </button>
     );
   }
 
-  if (status === "chaud") {
+  // CHAUD variant (default)
+  if (status === "chaud" || status === "going") {
     return (
       <button
         ref={btnRef}
@@ -79,12 +122,13 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill }: Props) {
           base,
           sizeClasses,
           fullWidth && "w-full",
-          "bg-gradient-flame text-primary-foreground shadow-flame",
+          "text-primary-foreground shadow-flame",
           pulse && "animate-flame-pulse"
         )}
+        style={{ background: "#E8593C" }}
       >
         <Flame className={cn(iconSize, "animate-flame-flicker")} fill="currentColor" />
-        Je suis chaud !
+        Chaud ! 🔥
       </button>
     );
   }
@@ -97,12 +141,13 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill }: Props) {
         base,
         sizeClasses,
         fullWidth && "w-full",
-        "bg-primary text-primary-foreground hover:brightness-110",
+        "border bg-transparent text-foreground hover:bg-secondary",
         pulse && "animate-flame-pulse"
       )}
+      style={{ borderColor: "#333" }}
     >
       <Flame className={iconSize} />
-      Je suis chaud !
+      Je suis chaud 🔥
     </button>
   );
 }
