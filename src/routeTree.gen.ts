@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SocialRouteImport } from './routes/social'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as CreateEventRouteImport } from './routes/create-event'
 import { Route as BecomeOrganizerRouteImport } from './routes/become-organizer'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -24,6 +26,11 @@ const SocialRoute = SocialRouteImport.update({
   path: '/social',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -32,6 +39,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditProfileRoute = EditProfileRouteImport.update({
+  id: '/edit-profile',
+  path: '/edit-profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreateEventRoute = CreateEventRouteImport.update({
@@ -71,8 +83,10 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/become-organizer': typeof BecomeOrganizerRoute
   '/create-event': typeof CreateEventRoute
+  '/edit-profile': typeof EditProfileRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/social': typeof SocialRoute
   '/event/$eventId': typeof EventEventIdRoute
 }
@@ -82,8 +96,10 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/become-organizer': typeof BecomeOrganizerRoute
   '/create-event': typeof CreateEventRoute
+  '/edit-profile': typeof EditProfileRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/social': typeof SocialRoute
   '/event/$eventId': typeof EventEventIdRoute
 }
@@ -94,8 +110,10 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/become-organizer': typeof BecomeOrganizerRoute
   '/create-event': typeof CreateEventRoute
+  '/edit-profile': typeof EditProfileRoute
   '/explore': typeof ExploreRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/social': typeof SocialRoute
   '/event/$eventId': typeof EventEventIdRoute
 }
@@ -107,8 +125,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/become-organizer'
     | '/create-event'
+    | '/edit-profile'
     | '/explore'
     | '/profile'
+    | '/settings'
     | '/social'
     | '/event/$eventId'
   fileRoutesByTo: FileRoutesByTo
@@ -118,8 +138,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/become-organizer'
     | '/create-event'
+    | '/edit-profile'
     | '/explore'
     | '/profile'
+    | '/settings'
     | '/social'
     | '/event/$eventId'
   id:
@@ -129,8 +151,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/become-organizer'
     | '/create-event'
+    | '/edit-profile'
     | '/explore'
     | '/profile'
+    | '/settings'
     | '/social'
     | '/event/$eventId'
   fileRoutesById: FileRoutesById
@@ -141,8 +165,10 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BecomeOrganizerRoute: typeof BecomeOrganizerRoute
   CreateEventRoute: typeof CreateEventRoute
+  EditProfileRoute: typeof EditProfileRoute
   ExploreRoute: typeof ExploreRoute
   ProfileRoute: typeof ProfileRoute
+  SettingsRoute: typeof SettingsRoute
   SocialRoute: typeof SocialRoute
   EventEventIdRoute: typeof EventEventIdRoute
 }
@@ -154,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/social'
       fullPath: '/social'
       preLoaderRoute: typeof SocialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -168,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/edit-profile': {
+      id: '/edit-profile'
+      path: '/edit-profile'
+      fullPath: '/edit-profile'
+      preLoaderRoute: typeof EditProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/create-event': {
@@ -221,11 +261,22 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BecomeOrganizerRoute: BecomeOrganizerRoute,
   CreateEventRoute: CreateEventRoute,
+  EditProfileRoute: EditProfileRoute,
   ExploreRoute: ExploreRoute,
   ProfileRoute: ProfileRoute,
+  SettingsRoute: SettingsRoute,
   SocialRoute: SocialRoute,
   EventEventIdRoute: EventEventIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

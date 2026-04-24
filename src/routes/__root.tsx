@@ -1,9 +1,14 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { FlameProvider } from "@/lib/flame-store";
 import { AuthProvider } from "@/lib/auth-store";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
+
+interface RouterContext {
+  queryClient: QueryClient;
+}
 
 function NotFoundComponent() {
   return (
@@ -27,7 +32,7 @@ function NotFoundComponent() {
   );
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -51,6 +56,12 @@ export const Route = createRootRoute({
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap",
       },
+      {
+        rel: "stylesheet",
+        href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+        integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",
+        crossOrigin: "",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -73,12 +84,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
   return (
-    <AuthProvider>
-      <FlameProvider>
-        <Outlet />
-        <Toaster />
-      </FlameProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <FlameProvider>
+          <Outlet />
+          <Toaster />
+        </FlameProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

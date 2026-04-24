@@ -5,7 +5,7 @@ import football from "@/assets/event-football.jpg";
 import expo from "@/assets/event-expo.jpg";
 import djset from "@/assets/event-djset.jpg";
 
-export type Category = "Soirée" | "Concert" | "Sport" | "Culture" | "Networking";
+export type Category = "Soirée" | "Concert" | "Sport" | "Culture" | "Networking" | "Gastronomie" | "Autre";
 export type FlameStatus = "none" | "chaud" | "going";
 
 export type Friend = {
@@ -191,5 +191,7 @@ export const categoryColor = (c: Category): string => {
     case "Sport": return "var(--cat-sport)";
     case "Culture": return "var(--cat-culture)";
     case "Networking": return "var(--cat-networking)";
+    case "Gastronomie": return "oklch(0.7 0.16 60)";
+    case "Autre": return "oklch(0.6 0.05 250)";
   }
 };

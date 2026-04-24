@@ -112,6 +112,50 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_user_id: string | null
+          body: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          is_read: boolean
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          body?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          is_read?: boolean
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          body?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          is_read?: boolean
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizer_requests: {
         Row: {
           activity_type: string
@@ -223,6 +267,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          created_at: string
+          notif_event_reminders: boolean
+          notif_friends_activity: boolean
+          notif_nearby_events: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          notif_event_reminders?: boolean
+          notif_friends_activity?: boolean
+          notif_nearby_events?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          notif_event_reminders?: boolean
+          notif_friends_activity?: boolean
+          notif_nearby_events?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -253,6 +324,12 @@ export type Database = {
       event_privacy: "public" | "friends" | "invite"
       event_status: "draft" | "published" | "cancelled"
       flame_status: "chaud" | "going"
+      notification_type:
+        | "flame"
+        | "event_published"
+        | "welcome"
+        | "friend_joined"
+        | "event_reminder"
       organizer_request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -394,6 +471,13 @@ export const Constants = {
       event_privacy: ["public", "friends", "invite"],
       event_status: ["draft", "published", "cancelled"],
       flame_status: ["chaud", "going"],
+      notification_type: [
+        "flame",
+        "event_published",
+        "welcome",
+        "friend_joined",
+        "event_reminder",
+      ],
       organizer_request_status: ["pending", "approved", "rejected"],
     },
   },
