@@ -270,6 +270,54 @@ function ExplorePage() {
           </div>
         )}
 
+        {/* Horizontal scroll list of events on map */}
+        {!selected && filtered.length > 0 && (
+          <div className="absolute bottom-20 left-0 right-0 z-[400] no-scrollbar flex gap-3 overflow-x-auto px-4 pb-1">
+            {filtered.map((e) => {
+              const total = (counts[e.id]?.chaud ?? 0) + (counts[e.id]?.going ?? 0);
+              return (
+                <button
+                  key={e.id}
+                  onClick={() => {
+                    setSelected(e);
+                    mapInstance.current?.setView([Number(e.lat), Number(e.lng)], 15);
+                  }}
+                  className="flex w-[260px] shrink-0 items-center gap-3 rounded-2xl border border-border bg-card/95 p-2.5 text-left shadow-elevated backdrop-blur-xl"
+                >
+                  <div
+                    className="h-14 w-14 shrink-0 rounded-xl bg-cover bg-center"
+                    style={{
+                      backgroundImage: e.cover_url
+                        ? `url(${e.cover_url})`
+                        : "linear-gradient(135deg,#E8593C,#F97316)",
+                    }}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-foreground">{e.title}</p>
+                    <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      {e.location_name}
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 text-[11px] font-semibold text-accent">
+                      <Flame className="h-3 w-3" fill="currentColor" />
+                      {total} · {dayLabelFromDate(e.event_date, e.event_time)}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Empty state on map */}
+        {!selected && filtered.length === 0 && (
+          <div className="absolute bottom-24 left-1/2 z-[400] -translate-x-1/2 rounded-2xl border border-border bg-card/95 px-5 py-3 text-center shadow-elevated backdrop-blur-xl">
+            <p className="text-2xl">🗺️</p>
+            <p className="mt-1 text-xs font-semibold text-foreground">Aucun événement à afficher</p>
+            <p className="text-[11px] text-muted-foreground">Essaie d'autres filtres.</p>
+          </div>
+        )}
+
         {/* Filter sheet */}
         {filterOpen && (
           <div className="fixed inset-0 z-[500]">
