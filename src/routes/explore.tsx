@@ -138,7 +138,7 @@ function ExplorePage() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const ll: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-        mapInstance.current!.flyTo(ll, 14, { duration: 0.7 });
+        mapInstance.current!.setView(ll, 14);
         if (userMarker.current) userMarker.current.remove();
         const icon = L.divIcon({
           html: `<div style="width:18px;height:18px;background:#3B82F6;border-radius:50%;border:3px solid white;box-shadow:0 0 0 8px rgba(59,130,246,0.25)"></div>`,
