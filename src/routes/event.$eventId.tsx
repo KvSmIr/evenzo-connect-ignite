@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { ArrowLeft, MapPin, Calendar, Navigation, Share2, Flame, Users } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Navigation, Share2, Flame, Users, Pencil } from "lucide-react";
 import { MobileFrame } from "@/components/MobileFrame";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { FlameButton } from "@/components/FlameButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEvent, dayLabelFromDate, formatTime, priceLabel } from "@/lib/events-query";
 import { useFlames } from "@/lib/flame-store";
+import { useAuth } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/event/$eventId")({
   head: () => ({
@@ -18,6 +19,7 @@ function EventDetailPage() {
   const { eventId } = useParams({ from: "/event/$eventId" });
   const { data: event, isLoading, isError } = useEvent(eventId);
   const { counts } = useFlames();
+  const { user, role } = useAuth();
 
   if (isLoading) {
     return (

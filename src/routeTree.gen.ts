@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventEventIdRouteImport } from './routes/event.$eventId'
+import { Route as EventEventIdEditRouteImport } from './routes/event.$eventId.edit'
 
 const SocialRoute = SocialRouteImport.update({
   id: '/social',
@@ -76,6 +77,11 @@ const EventEventIdRoute = EventEventIdRouteImport.update({
   path: '/event/$eventId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventEventIdEditRoute = EventEventIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => EventEventIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,7 +94,8 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/social': typeof SocialRoute
-  '/event/$eventId': typeof EventEventIdRoute
+  '/event/$eventId': typeof EventEventIdRouteWithChildren
+  '/event/$eventId/edit': typeof EventEventIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,7 +108,8 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/social': typeof SocialRoute
-  '/event/$eventId': typeof EventEventIdRoute
+  '/event/$eventId': typeof EventEventIdRouteWithChildren
+  '/event/$eventId/edit': typeof EventEventIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,7 +123,8 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/social': typeof SocialRoute
-  '/event/$eventId': typeof EventEventIdRoute
+  '/event/$eventId': typeof EventEventIdRouteWithChildren
+  '/event/$eventId/edit': typeof EventEventIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/social'
     | '/event/$eventId'
+    | '/event/$eventId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/social'
     | '/event/$eventId'
+    | '/event/$eventId/edit'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/social'
     | '/event/$eventId'
+    | '/event/$eventId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -170,7 +182,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
   SocialRoute: typeof SocialRoute
-  EventEventIdRoute: typeof EventEventIdRoute
+  EventEventIdRoute: typeof EventEventIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -252,8 +264,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventEventIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/event/$eventId/edit': {
+      id: '/event/$eventId/edit'
+      path: '/edit'
+      fullPath: '/event/$eventId/edit'
+      preLoaderRoute: typeof EventEventIdEditRouteImport
+      parentRoute: typeof EventEventIdRoute
+    }
   }
 }
+
+interface EventEventIdRouteChildren {
+  EventEventIdEditRoute: typeof EventEventIdEditRoute
+}
+
+const EventEventIdRouteChildren: EventEventIdRouteChildren = {
+  EventEventIdEditRoute: EventEventIdEditRoute,
+}
+
+const EventEventIdRouteWithChildren = EventEventIdRoute._addFileChildren(
+  EventEventIdRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -266,7 +297,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
   SocialRoute: SocialRoute,
-  EventEventIdRoute: EventEventIdRoute,
+  EventEventIdRoute: EventEventIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
