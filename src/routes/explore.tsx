@@ -127,7 +127,7 @@ function ExplorePage() {
       const marker = L.marker([Number(e.lat), Number(e.lng)], { icon });
       marker.on("click", () => {
         setSelected(e);
-        mapInstance.current!.flyTo([Number(e.lat), Number(e.lng)], 15, { duration: 0.6 });
+        mapInstance.current!.setView([Number(e.lat), Number(e.lng)], 15);
       });
       marker.addTo(markersLayer.current!);
     }
@@ -185,7 +185,7 @@ function ExplorePage() {
                   key={e.id}
                   onClick={() => {
                     setSelected(e);
-                    mapInstance.current?.flyTo([Number(e.lat), Number(e.lng)], 15, { duration: 0.6 });
+                    mapInstance.current?.setView([Number(e.lat), Number(e.lng)], 15);
                     setQuery("");
                   }}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-secondary/60"
