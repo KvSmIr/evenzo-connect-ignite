@@ -55,6 +55,7 @@ function EventDetailPage() {
   const orgAvatar =
     event.organizer?.avatar_url ??
     `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(orgName)}&backgroundColor=E8593C`;
+  const canEdit = !!user && (user.id === event.organizer_id || role === "admin");
 
   return (
     <MobileFrame>
@@ -73,6 +74,18 @@ function EventDetailPage() {
         >
           <ArrowLeft className="h-5 w-5 text-foreground" />
         </Link>
+
+        {canEdit && (
+          <Link
+            to="/event/$eventId/edit"
+            params={{ eventId: event.id }}
+            aria-label="Modifier"
+            className="absolute right-4 top-4 flex h-10 items-center gap-1.5 rounded-full bg-background/70 px-3 text-xs font-bold text-foreground backdrop-blur-md pt-safe"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Modifier
+          </Link>
+        )}
 
         <div className="absolute bottom-0 left-0 right-0 space-y-2 p-5">
           <CategoryBadge category={event.category as never} />
