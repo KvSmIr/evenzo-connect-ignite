@@ -67,6 +67,8 @@ function ExplorePage() {
       zoom: 13,
       zoomControl: false,
       attributionControl: true,
+      fadeAnimation: false,
+      zoomAnimation: false,
     });
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
       attribution: "© OpenStreetMap © CARTO",
@@ -77,7 +79,16 @@ function ExplorePage() {
     mapInstance.current = map;
 
     return () => {
-      map.remove();
+      try {
+        map.stop();
+        markersLayer.current?.clearLayers();
+        markersLayer.current = null;
+        userMarker.current = null;
+        map.off();
+        map.remove();
+      } catch {
+        // ignore — leaflet sometimes throws during teardown after a zoom transition
+      }
       mapInstance.current = null;
     };
   }, []);
