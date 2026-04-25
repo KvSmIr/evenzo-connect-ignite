@@ -44,16 +44,16 @@ export function useEventsFeed() {
 
   // Realtime subscription
   useEffect(() => {
-    const channel = supabase
-      .channel("events-feed")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "events" },
-        () => {
-          qc.invalidateQueries({ queryKey: EVENTS_QUERY_KEY });
-        }
-      )
-      .subscribe();
+    const channelName = `events-feed-${Math.random().toString(36).slice(2, 10)}`;
+    const channel = supabase.channel(channelName);
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "events" },
+      () => {
+        qc.invalidateQueries({ queryKey: EVENTS_QUERY_KEY });
+      }
+    );
+    channel.subscribe();
     return () => {
       supabase.removeChannel(channel);
     };

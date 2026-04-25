@@ -28,19 +28,20 @@ export function useNotifications() {
 
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel(`notif-${user.id}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        () => qc.invalidateQueries({ queryKey: key })
-      )
-      .subscribe();
+    // Unique channel name avoids reusing a still-subscribed channel under StrictMode/HMR.
+    const channelName = `notif-${user.id}-${Math.random().toString(36).slice(2, 10)}`;
+    const channel = supabase.channel(channelName);
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+      () => qc.invalidateQueries({ queryKey: ["notifications", user.id] })
+    );
+    channel.subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user?.id]);
 
   const unreadCount = (query.data ?? []).filter((n) => !n.is_read).length;
 

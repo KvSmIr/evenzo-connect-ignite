@@ -41,36 +41,36 @@ export function FlameProvider({ children }: { children: ReactNode }) {
       setFlames(mine);
     })();
 
-    const channel = supabase
-      .channel("flames-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "flames" },
-        (payload) => {
-          setCounts((prev) => {
-            const next = { ...prev };
-            const apply = (eid: string, status: FlameStatus, delta: number) => {
-              if (!next[eid]) next[eid] = { chaud: 0, going: 0 };
-              if (status === "chaud") next[eid] = { ...next[eid], chaud: Math.max(0, next[eid].chaud + delta) };
-              if (status === "going") next[eid] = { ...next[eid], going: Math.max(0, next[eid].going + delta) };
-            };
-            if (payload.eventType === "INSERT") {
-              const n = payload.new as { event_id: string; status: FlameStatus };
-              apply(n.event_id, n.status, +1);
-            } else if (payload.eventType === "DELETE") {
-              const o = payload.old as { event_id: string; status: FlameStatus };
-              apply(o.event_id, o.status, -1);
-            } else if (payload.eventType === "UPDATE") {
-              const o = payload.old as { event_id: string; status: FlameStatus };
-              const n = payload.new as { event_id: string; status: FlameStatus };
-              apply(o.event_id, o.status, -1);
-              apply(n.event_id, n.status, +1);
-            }
-            return next;
-          });
-        }
-      )
-      .subscribe();
+    const channelName = `flames-realtime-${Math.random().toString(36).slice(2, 10)}`;
+    const channel = supabase.channel(channelName);
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "flames" },
+      (payload) => {
+        setCounts((prev) => {
+          const next = { ...prev };
+          const apply = (eid: string, status: FlameStatus, delta: number) => {
+            if (!next[eid]) next[eid] = { chaud: 0, going: 0 };
+            if (status === "chaud") next[eid] = { ...next[eid], chaud: Math.max(0, next[eid].chaud + delta) };
+            if (status === "going") next[eid] = { ...next[eid], going: Math.max(0, next[eid].going + delta) };
+          };
+          if (payload.eventType === "INSERT") {
+            const n = payload.new as { event_id: string; status: FlameStatus };
+            apply(n.event_id, n.status, +1);
+          } else if (payload.eventType === "DELETE") {
+            const o = payload.old as { event_id: string; status: FlameStatus };
+            apply(o.event_id, o.status, -1);
+          } else if (payload.eventType === "UPDATE") {
+            const o = payload.old as { event_id: string; status: FlameStatus };
+            const n = payload.new as { event_id: string; status: FlameStatus };
+            apply(o.event_id, o.status, -1);
+            apply(n.event_id, n.status, +1);
+          }
+          return next;
+        });
+      }
+    );
+    channel.subscribe();
 
     return () => {
       active = false;
