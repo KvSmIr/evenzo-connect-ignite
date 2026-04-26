@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { ArrowLeft, MapPin, Calendar, Navigation, Share2, Flame, Users, Pencil } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Navigation, Flame, Users, Pencil } from "lucide-react";
 import { MobileFrame } from "@/components/MobileFrame";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { FlameButton } from "@/components/FlameButton";
+import { FollowButton } from "@/components/FollowButton";
+import { ShareButton } from "@/components/ShareButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEvent, dayLabelFromDate, formatTime, priceLabel } from "@/lib/events-query";
 import { useFlames } from "@/lib/flame-store";
@@ -106,9 +108,7 @@ function EventDetailPage() {
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Organisateur</p>
             <p className="text-sm font-bold text-foreground">{orgName}</p>
           </div>
-          <button className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground">
-            Suivre
-          </button>
+          <FollowButton organizerId={event.organizer_id} />
         </div>
 
         <div className="flex items-center gap-2">
@@ -162,17 +162,11 @@ function EventDetailPage() {
         </div>
       </div>
 
-      <button
-        aria-label="Partager"
-        onClick={() => {
-          if (navigator.share) {
-            navigator.share({ title: event.title, url: window.location.href }).catch(() => {});
-          }
-        }}
-        className="fixed bottom-24 right-4 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-card shadow-elevated border border-border md:right-[max(1rem,calc(50%-215px+1rem))]"
-      >
-        <Share2 className="h-5 w-5 text-foreground" />
-      </button>
+      <ShareButton
+        title={event.title}
+        date={dayLabelFromDate(event.event_date, event.event_time)}
+        locationName={event.location_name}
+      />
     </MobileFrame>
   );
 }
