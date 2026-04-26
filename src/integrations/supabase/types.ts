@@ -26,6 +26,7 @@ export type Database = {
           is_free: boolean
           lat: number | null
           lng: number | null
+          location_address: string | null
           location_name: string
           max_capacity: number | null
           organizer_id: string
@@ -47,6 +48,7 @@ export type Database = {
           is_free?: boolean
           lat?: number | null
           lng?: number | null
+          location_address?: string | null
           location_name: string
           max_capacity?: number | null
           organizer_id: string
@@ -68,6 +70,7 @@ export type Database = {
           is_free?: boolean
           lat?: number | null
           lng?: number | null
+          location_address?: string | null
           location_name?: string
           max_capacity?: number | null
           organizer_id?: string
@@ -111,6 +114,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
