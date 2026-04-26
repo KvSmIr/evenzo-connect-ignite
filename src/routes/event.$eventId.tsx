@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useParams } from "@tanstack/react-router";
 import { ArrowLeft, MapPin, Calendar, Navigation, Flame, Users, Pencil } from "lucide-react";
 import { MobileFrame } from "@/components/MobileFrame";
 import { CategoryBadge } from "@/components/CategoryBadge";
@@ -19,9 +19,14 @@ export const Route = createFileRoute("/event/$eventId")({
 
 function EventDetailPage() {
   const { eventId } = useParams({ from: "/event/$eventId" });
+  const pathname = useLocation({ select: (location) => location.pathname });
   const { data: event, isLoading, isError } = useEvent(eventId);
   const { counts } = useFlames();
   const { user, role } = useAuth();
+
+  if (pathname.endsWith("/edit")) {
+    return <Outlet />;
+  }
 
   if (isLoading) {
     return (
