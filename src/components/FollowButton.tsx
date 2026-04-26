@@ -104,4 +104,3 @@ export function FollowButton({ organizerId }: Props) {
   );
 }
 
-void useNavigate; // keep import for future inline auth nav
