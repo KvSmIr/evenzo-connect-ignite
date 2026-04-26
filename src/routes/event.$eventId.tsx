@@ -123,7 +123,7 @@ function EventDetailPage() {
         <button
           onClick={() => {
             if (event.lat != null && event.lng != null) {
-              window.open(`https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}`, "_blank");
+              window.open(`https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}&travelmode=driving`, "_blank");
             } else {
               window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location_name)}`, "_blank");
             }
