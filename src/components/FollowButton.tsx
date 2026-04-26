@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Check, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-store";
-import { useNavigate } from "@tanstack/react-router";
+// no router nav needed here
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
