@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./auth-store";
 
@@ -27,6 +27,10 @@ export function FlameProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [flagsMap, setFlagsMap] = useState<FlameMap>({});
   const [counts, setCounts] = useState<CountMap>({});
+  // Track in-flight writes to prevent double-clicks and to ignore our own realtime echoes
+  const inFlightRef = useRef<Set<string>>(new Set());
+  const userIdRef = useRef<string | null>(null);
+  userIdRef.current = user?.id ?? null;
 
   useEffect(() => {
     let active = true;
@@ -64,10 +68,13 @@ export function FlameProvider({ children }: { children: ReactNode }) {
             };
           };
           if (payload.eventType === "INSERT") {
-            const n = payload.new as { event_id: string; status: FlameStatus };
+            const n = payload.new as { event_id: string; status: FlameStatus; user_id: string };
+            // Skip our own changes — they were already applied optimistically
+            if (n.user_id === userIdRef.current) return prev;
             apply(n.event_id, n.status, +1);
           } else if (payload.eventType === "DELETE") {
-            const o = payload.old as { event_id: string; status: FlameStatus };
+            const o = payload.old as { event_id: string; status: FlameStatus; user_id: string };
+            if (o.user_id === userIdRef.current) return prev;
             apply(o.event_id, o.status, -1);
           }
           return next;
@@ -87,9 +94,15 @@ export function FlameProvider({ children }: { children: ReactNode }) {
   const writeStatus = useCallback(
     async (eventId: string, status: FlameStatus, on: boolean) => {
       if (!user) return;
+      const key = `${eventId}:${status}`;
+      // Prevent rapid double-clicks while a write is in flight
+      if (inFlightRef.current.has(key)) return;
       const prev = flagsFor(eventId);
+      // No-op if already in desired state (avoids extra increments)
+      if (prev[status] === on) return;
+      inFlightRef.current.add(key);
       // optimistic
-      setFlagsMap((m) => ({ ...m, [eventId]: { ...prev, [status]: on } }));
+      setFlagsMap((m) => ({ ...m, [eventId]: { ...(m[eventId] ?? empty), [status]: on } }));
       setCounts((c) => {
         const cur = c[eventId] ?? { chaud: 0, going: 0 };
         return {
@@ -99,23 +112,34 @@ export function FlameProvider({ children }: { children: ReactNode }) {
       });
       try {
         if (on) {
-          await supabase
+          const { error } = await supabase
             .from("flames")
             .upsert(
               { user_id: user.id, event_id: eventId, status },
-              { onConflict: "user_id,event_id,status" }
+              { onConflict: "user_id,event_id,status", ignoreDuplicates: true }
             );
+          if (error) throw error;
         } else {
-          await supabase
+          const { error } = await supabase
             .from("flames")
             .delete()
             .eq("user_id", user.id)
             .eq("event_id", eventId)
             .eq("status", status);
+          if (error) throw error;
         }
       } catch {
-        // revert
+        // revert state and counts
         setFlagsMap((m) => ({ ...m, [eventId]: prev }));
+        setCounts((c) => {
+          const cur = c[eventId] ?? { chaud: 0, going: 0 };
+          return {
+            ...c,
+            [eventId]: { ...cur, [status]: Math.max(0, cur[status] + (on ? -1 : +1)) },
+          };
+        });
+      } finally {
+        inFlightRef.current.delete(key);
       }
     },
     [user, flagsFor]
