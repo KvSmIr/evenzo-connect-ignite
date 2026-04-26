@@ -280,7 +280,7 @@ function CreateEventPage() {
               <div className="p-3">
                 <p className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
                   <MapPin className="h-3.5 w-3.5 text-primary" />
-                  {location || "Lieu"}
+                  {picked?.name || "Lieu"}
                 </p>
               </div>
             </div>
@@ -289,7 +289,7 @@ function CreateEventPage() {
               {[
                 { ok: !!coverFile, l: "Photo de couverture ajoutée" },
                 { ok: !!title, l: "Titre renseigné" },
-                { ok: !!date && !!location, l: "Date et lieu confirmés" },
+                { ok: !!date && !!picked, l: "Date et lieu confirmés" },
                 { ok: true, l: "Badge Organisateur Vérifié ✓" },
               ].map((c) => (
                 <div key={c.l} className="flex items-center gap-2 text-sm">
