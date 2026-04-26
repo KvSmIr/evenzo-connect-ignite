@@ -10,7 +10,6 @@ type Props = { organizerId: string };
 
 export function FollowButton({ organizerId }: Props) {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [following, setFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
