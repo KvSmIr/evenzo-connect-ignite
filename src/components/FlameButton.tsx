@@ -16,10 +16,11 @@ type Props = {
 };
 
 export function FlameButton({ eventId, size = "md", fullWidth, pill, variant = "chaud" }: Props) {
-  const { flames, toggleChaud, toggleGoing, setFlame } = useFlames();
+  const { flagsFor, toggleChaud, toggleGoing } = useFlames();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const status = flames[eventId] ?? "none";
+  const flags = flagsFor(eventId);
+  const isActive = variant === "going" ? flags.going : flags.chaud;
   const [pulse, setPulse] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -34,34 +35,26 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill, variant = "
     setPulse(true);
     setTimeout(() => setPulse(false), 600);
 
-    let next: "none" | "chaud" | "going";
     if (variant === "going") {
-      // Going: if already going, remove. If chaud, upgrade to going. Else become going.
-      if (status === "going") next = await setFlame(eventId, "none");
-      else next = await setFlame(eventId, "going");
+      await toggleGoing(eventId);
     } else {
-      // Chaud toggle
-      next = await toggleChaud(eventId);
-    }
-
-    if (next === "chaud" && btnRef.current) {
-      const rect = btnRef.current.getBoundingClientRect();
-      const x = (rect.left + rect.width / 2) / window.innerWidth;
-      const y = (rect.top + rect.height / 2) / window.innerHeight;
-      confetti({
-        particleCount: 60,
-        spread: 70,
-        startVelocity: 35,
-        origin: { x, y },
-        colors: ["#E8593C", "#F97316", "#FBBF24", "#FFFFFF"],
-        scalar: 0.8,
-        ticks: 120,
-      });
+      const next = await toggleChaud(eventId);
+      if (next === "chaud" && btnRef.current) {
+        const rect = btnRef.current.getBoundingClientRect();
+        const x = (rect.left + rect.width / 2) / window.innerWidth;
+        const y = (rect.top + rect.height / 2) / window.innerHeight;
+        confetti({
+          particleCount: 60,
+          spread: 70,
+          startVelocity: 35,
+          origin: { x, y },
+          colors: ["#E8593C", "#F97316", "#FBBF24", "#FFFFFF"],
+          scalar: 0.8,
+          ticks: 120,
+        });
+      }
     }
   };
-
-  // Suppress unused warning for toggleGoing (kept exported on hook for callers)
-  void toggleGoing;
 
   const sizeClasses = pill
     ? "h-10 px-4 text-[13px]"
@@ -74,20 +67,14 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill, variant = "
   const radius = pill ? "rounded-[20px]" : "rounded-lg";
   const base = `inline-flex items-center justify-center gap-2 ${radius} font-bold transition-all active:scale-[0.97] select-none`;
 
-  // GOING variant
+  // GOING variant — independent of chaud
   if (variant === "going") {
-    if (status === "going") {
+    if (isActive) {
       return (
         <button
           ref={btnRef}
           onClick={handleClick}
-          className={cn(
-            base,
-            sizeClasses,
-            fullWidth && "w-full",
-            "text-primary-foreground",
-            pulse && "animate-flame-pulse"
-          )}
+          className={cn(base, sizeClasses, fullWidth && "w-full", "text-primary-foreground", pulse && "animate-flame-pulse")}
           style={{ background: "#1D9E75" }}
         >
           <Check className={iconSize} strokeWidth={3} />
@@ -99,12 +86,7 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill, variant = "
       <button
         ref={btnRef}
         onClick={handleClick}
-        className={cn(
-          base,
-          sizeClasses,
-          fullWidth && "w-full",
-          "border border-border bg-secondary text-foreground hover:bg-surface-elevated"
-        )}
+        className={cn(base, sizeClasses, fullWidth && "w-full", "border border-border bg-secondary text-foreground hover:bg-surface-elevated")}
       >
         <Navigation className={iconSize} />
         Y aller
@@ -112,19 +94,13 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill, variant = "
     );
   }
 
-  // CHAUD variant (default)
-  if (status === "chaud" || status === "going") {
+  // CHAUD variant — independent of going
+  if (isActive) {
     return (
       <button
         ref={btnRef}
         onClick={handleClick}
-        className={cn(
-          base,
-          sizeClasses,
-          fullWidth && "w-full",
-          "text-primary-foreground shadow-flame",
-          pulse && "animate-flame-pulse"
-        )}
+        className={cn(base, sizeClasses, fullWidth && "w-full", "text-primary-foreground shadow-flame", pulse && "animate-flame-pulse")}
         style={{ background: "#E8593C" }}
       >
         <Flame className={cn(iconSize, "animate-flame-flicker")} fill="currentColor" />
@@ -137,13 +113,7 @@ export function FlameButton({ eventId, size = "md", fullWidth, pill, variant = "
     <button
       ref={btnRef}
       onClick={handleClick}
-      className={cn(
-        base,
-        sizeClasses,
-        fullWidth && "w-full",
-        "border bg-transparent text-foreground hover:bg-secondary",
-        pulse && "animate-flame-pulse"
-      )}
+      className={cn(base, sizeClasses, fullWidth && "w-full", "border bg-transparent text-foreground hover:bg-secondary", pulse && "animate-flame-pulse")}
       style={{ borderColor: "#333" }}
     >
       <Flame className={iconSize} />

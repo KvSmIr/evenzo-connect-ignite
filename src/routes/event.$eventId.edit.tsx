@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useParams, Link } from "@tanstack/react-r
 import { useEffect, useState } from "react";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
 import { MobileFrame } from "@/components/MobileFrame";
+import { LocationPicker, type PickedLocation } from "@/components/LocationPicker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-store";
@@ -29,7 +30,7 @@ function EditEventPage() {
   const [category, setCategory] = useState("Soirée");
   const [eventDate, setEventDate] = useState("");
   const [eventTime, setEventTime] = useState("");
-  const [locationName, setLocationName] = useState("");
+  const [picked, setPicked] = useState<PickedLocation | null>(null);
   const [isFree, setIsFree] = useState(true);
   const [price, setPrice] = useState<string>("0");
   const [saving, setSaving] = useState(false);
@@ -41,7 +42,12 @@ function EditEventPage() {
     setCategory(event.category);
     setEventDate(event.event_date);
     setEventTime(event.event_time?.slice(0, 5) ?? "");
-    setLocationName(event.location_name);
+    setPicked({
+      name: event.location_name,
+      address: (event as { location_address?: string | null }).location_address ?? event.location_name,
+      lat: Number(event.lat ?? 6.1375),
+      lng: Number(event.lng ?? 1.2123),
+    });
     setIsFree(event.is_free);
     setPrice(String(event.price ?? 0));
   }, [event]);
@@ -98,7 +104,10 @@ function EditEventPage() {
         category: category as never,
         event_date: eventDate,
         event_time: `${eventTime}:00`,
-        location_name: locationName.trim(),
+        location_name: picked?.name ?? "",
+        location_address: picked?.address ?? null,
+        lat: picked?.lat ?? null,
+        lng: picked?.lng ?? null,
         is_free: isFree,
         price: isFree ? 0 : Number(price) || 0,
       })
@@ -202,12 +211,7 @@ function EditEventPage() {
         </div>
 
         <Field label="Lieu">
-          <input
-            value={locationName}
-            onChange={(e) => setLocationName(e.target.value)}
-            required
-            className="input"
-          />
+          <LocationPicker value={picked} onChange={setPicked} />
         </Field>
 
         <div className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3">

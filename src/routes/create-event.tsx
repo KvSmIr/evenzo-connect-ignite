@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { X, ArrowLeft, MapPin, Check, AlertTriangle, PartyPopper } from "lucide-react";
 import confetti from "canvas-confetti";
 import { MobileFrame } from "@/components/MobileFrame";
+import { LocationPicker, type PickedLocation } from "@/components/LocationPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
@@ -37,7 +38,7 @@ function CreateEventPage() {
   const [category, setCategory] = useState<Category>("Soirée");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [location, setLocation] = useState("");
+  const [picked, setPicked] = useState<PickedLocation | null>(null);
   const [description, setDescription] = useState("");
   const [isFree, setIsFree] = useState(true);
   const [price, setPrice] = useState("");
@@ -57,7 +58,7 @@ function CreateEventPage() {
     setCoverPreview(f ? URL.createObjectURL(f) : null);
   };
 
-  const canStep1 = title && date && time && location;
+  const canStep1 = !!(title && date && time && picked);
   const canStep2 = description.length > 0 && (isFree || price);
 
   const publish = async (status: "published" | "draft") => {
@@ -75,17 +76,14 @@ function CreateEventPage() {
         const { data } = supabase.storage.from("event-covers").getPublicUrl(path);
         cover_url = data.publicUrl;
       }
-      // Default Lomé center if no geo
-      const lat = 6.1375 + (Math.random() - 0.5) * 0.04;
-      const lng = 1.2123 + (Math.random() - 0.5) * 0.04;
-
       const { error } = await supabase.from("events").insert({
         organizer_id: user.id,
         title,
         description,
         event_date: date,
         event_time: time,
-        location_name: location,
+        location_name: picked!.name,
+        location_address: picked!.address,
         category,
         cover_url,
         is_free: isFree,
@@ -93,8 +91,8 @@ function CreateEventPage() {
         max_capacity: capacity ? Number(capacity) : null,
         privacy,
         status,
-        lat,
-        lng,
+        lat: picked!.lat,
+        lng: picked!.lng,
       });
       if (error) throw error;
 
@@ -206,10 +204,7 @@ function CreateEventPage() {
             </div>
 
             <Field label="Lieu" required>
-              <div className="relative">
-                <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
-                <input required value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Nom du lieu, Lomé" className="input pl-9" />
-              </div>
+              <LocationPicker value={picked} onChange={setPicked} />
             </Field>
           </div>
         )}
@@ -285,7 +280,7 @@ function CreateEventPage() {
               <div className="p-3">
                 <p className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
                   <MapPin className="h-3.5 w-3.5 text-primary" />
-                  {location || "Lieu"}
+                  {picked?.name || "Lieu"}
                 </p>
               </div>
             </div>
@@ -294,7 +289,7 @@ function CreateEventPage() {
               {[
                 { ok: !!coverFile, l: "Photo de couverture ajoutée" },
                 { ok: !!title, l: "Titre renseigné" },
-                { ok: !!date && !!location, l: "Date et lieu confirmés" },
+                { ok: !!date && !!picked, l: "Date et lieu confirmés" },
                 { ok: true, l: "Badge Organisateur Vérifié ✓" },
               ].map((c) => (
                 <div key={c.l} className="flex items-center gap-2 text-sm">
